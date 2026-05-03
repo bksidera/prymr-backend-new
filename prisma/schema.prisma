@@ -1,0 +1,518 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id                         String                    @id @default(uuid())
+  profileIcon                String?
+  initialProfileIcon         String?
+  userName                   String?                   @unique
+  firstName                  String?
+  lastName                   String?
+  role                       String?
+  isDefaultCreatorUser       Boolean                   @default(false)
+  news                       String?
+  bio                        String?
+  cv                         String?
+  email                      String?                   @unique
+  password                   String?
+  profileBackGroundImg       String?
+  profileDescription         String?
+  profile_is_completed       Boolean                   @default(false)
+  is_Verified                Boolean                   @default(false)
+  isDeleted                  Boolean                   @default(false)
+  createdAt                  DateTime                  @default(now())
+  updatedAt                  DateTime                  @updatedAt
+  boards                     Board[] // Establishing the one-to-many relationship
+  BoardEvent                 BoardEvent[]
+  followers                  UserFollow[]              @relation("Followers")
+  followings                 UserFollow[]              @relation("Followings")
+  BookMark                   BookMarkFolder[]          @relation("BookMark")
+  FollowBoard                FollowBoard[]             @relation("followBoard")
+  sale                       sale[]                    @relation("sale")
+  Comment                    saleComments[]
+  Like                       saleLikes[]
+  boardComments              boardComments[]
+  BoardImagesCommentLikes    BoardImagesCommentLikes[]
+  Cart                       Cart[]                    @relation("userCart")
+  Collection                 Collection[]
+  Reaction                   Reaction[]
+  ReactionLikes              ReactionLikes[]
+  Tappable                   Tappable[]
+  UserCreatorRequests        UserCreatorRequests[]
+  stripeCustomerId           String?
+  stripeCustomer             StripeCustomer?           @relation("UserStripeCustomer", fields: [stripeCustomerId], references: [id])
+  sellerAccountId            String?
+  isStripeOnBoardingDone    Boolean                   @default(false)
+  sellerAccount              SellerAccount?            @relation("UserSellerAccount", fields: [sellerAccountId], references: [id])
+  ReplaceTappable            ReplaceTappable[]
+  newTransactionSenderUser   newTransaction[]          @relation("senderUser")
+  newTransactionReceiverUser newTransaction[]          @relation("receiverUser")
+}
+
+model securityKeys {
+  id  String @id @default(uuid())
+  key String @unique
+}
+
+model UserCreatorRequests {
+  id        String   @id @default(uuid())
+  userId    String
+  status    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reason    String?
+  user      user     @relation(fields: [userId], references: [id])
+}
+
+//store all user boards
+model Board {
+  id               String            @id @default(uuid())
+  userId           String
+  boardImageScr    String?
+  postInteractions Int?              @default(0)
+  allowComments    Boolean           @default(true) //per board wise assigne the permission to user can comment or not
+  user             user              @relation(fields: [userId], references: [id])
+  collectionId     String? //we are adding collection id is  an optionl because we hav to fill the data in addBoardInfo and at last api  i have to add board collection inside
+  collection       Collection?       @relation(fields: [collectionId], references: [id]) //per board must require the collection
+  isDeleted        Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  BoardEvent       BoardEvent[]
+  BoardImages      BoardImages[]
+  BookMarkBoards   BookMarksBoards[] @relation("BookMarkBoard")
+  FollowBoard      FollowBoard[]     @relation("followedBoard")
+  boardComments    boardComments[]
+  cart             Cart[]            @relation("boardCart")
+  Tappable         Tappable[]
+  Transaction      Transaction[]
+  newTransaction   newTransaction[]
+}
+
+//  @todo ask to quetion and add the decription column
+model Collection {
+  id             String   @id @default(uuid())
+  collectionName String
+  description    String?
+  userId         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           user     @relation(fields: [userId], references: [id])
+  Board          Board[]
+}
+
+//store one board multiple image
+//in this feature here is only one baord image so but in case upcomeming new featue can we create one board and multiple images
+// we are adding image wise comment.
+model BoardImages {
+  id                      String                    @id @default(uuid())
+  imageUrl                String
+  boardId                 String
+  title                   String?
+  description             String?
+  isPrivateBoard          Boolean                   @default(false)
+  subTitle                String?
+  allowComments           Boolean                   @default(false)
+  jsonElement             Json?
+  jsonComment             Json?
+  boardStatus             String                    @default("finished")
+  board                   Board                     @relation(fields: [boardId], references: [id])
+  tappable                Tappable[]
+  isDeleted               Boolean                   @default(false)
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  boardImagesComments     boardComments[]           @relation("boardImagesComments")
+  BoardImagesCommentLikes BoardImagesCommentLikes[] @relation("BoardsImagesCommentlikes")
+  Reaction                Reaction[]
+}
+
+model Tappable {
+  id                      String            @id @default(uuid())
+  ContentImagesLinks      String[]          @default([]) //after click o below tappable image, and emoji that time will dispaly the con.img
+  tappableImage           String? //uploaded image time it like emoji, and image
+  isInventoryEnabled      Boolean           @default(false)
+  inventoryCount          BigInt            @default(0)
+  inventoryAvailableCount BigInt            @default(0)
+  left                    String?
+  top                     String?
+  width                   String?
+  height                  String?
+  // Normalized 0–1 coordinates (resolution-agnostic, preferred for new boards)
+  normalizedX             Float?
+  normalizedY             Float?
+  normalizedW             Float?
+  normalizedH             Float?
+  title                   String?
+  subTitle                String?
+  // assetType               String? //physical/digital
+  isSaleItem              Boolean           @default(false)
+  price                   BigInt?
+  description             String?
+  layerName               String?
+  actionName              String?
+  boardImageId            String
+  boardId                 String?
+  userId                  String?
+  isTappable              Boolean           @default(true)
+  isVanish                Boolean           @default(false) //tappabl swich after is vanish flow or not
+  isReplace               Boolean           @default(false) //tappale swich after is replace flow or not
+  switchId                String?
+  isDeleted               Boolean           @default(false)
+  switch                  Switch?           @relation(fields: [switchId], references: [id])
+  board                   Board?            @relation(fields: [boardId], references: [id])
+  user                    user?             @relation(fields: [userId], references: [id])
+  boardImage              BoardImages       @relation(fields: [boardImageId], references: [id])
+  transactions            Transaction[]
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+  replaceTappable         ReplaceTappable[]
+}
+
+//swich inside replace tappable
+//we have info-overlay  and replace storing in same table
+model ReplaceTappable {
+  id                      String        @id @default(uuid()) // Primary key
+  tappableId              String // Foreign key to Tappable
+  // actionName String? //replace/ info-overlay - we are adding vanish flow also and addin info_overlay also
+  title                   String?
+  ContentImagesLinks      String[]      @default([])
+  layerName               String?
+  layerNumber             String?
+  // assetType               String? //physical/digital
+  isInventoryEnabled      Boolean       @default(false)
+  inventoryCount          BigInt        @default(0)
+  inventoryAvailableCount BigInt        @default(0)
+  userId                  String
+  description             String?
+  isLockTappable          Boolean       @default(false)
+  price                   String?
+  top                     String?
+  left                    String?
+  width                   String?
+  height                  String?
+  isReplace               Boolean       @default(false)
+  isVanish                Boolean       @default(false)
+  infoOverlayImage        String[]      @default([])
+  actionName              String? //follow/payment
+  lockTappableDescription String?
+  isDeleted               Boolean       @default(false)
+  isInfoOverlay           Boolean       @default(false)
+  tappable                Tappable      @relation(fields: [tappableId], references: [id])
+  user                    user          @relation(fields: [userId], references: [id])
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+  Transaction             Transaction[]
+  TransactionForVanish    Transaction[] @relation("vanishSwitch")
+}
+
+model payment {
+  id         String   @id @default(uuid())
+  email      String?
+  customerId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model StripeCustomer {
+  id             String           @id @default(uuid())
+  customerId     String           @unique
+  users          user[]           @relation("UserStripeCustomer")
+  transactions   Transaction[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  // newTransaction newTransaction[]
+}
+
+model Transaction {
+  id                  String           @id @default(uuid())
+  customerId          String?
+  customer            StripeCustomer?   @relation(fields: [customerId], references: [id])
+  sellerAccountId     String
+  customerGuest      Boolean          @default(false) // Guest user flag
+  sellerAccount       SellerAccount    @relation(fields: [sellerAccountId], references: [id])
+  tappableId          String?
+  tappable            Tappable?        @relation(fields: [tappableId], references: [id])
+  switchId            String?
+  replaceId           String?
+  switch              ReplaceTappable? @relation("vanishSwitch", fields: [switchId], references: [id])
+  ReplaceSwitch       ReplaceTappable? @relation(fields: [replaceId], references: [id])
+  boardId             String? // New field for board transactions
+  board               Board?           @relation(fields: [boardId], references: [id])
+  reactionId          String?
+  reaction            Reaction?        @relation(fields: [reactionId], references: [id])
+  price               BigInt
+  stripeTransactionId String           @unique
+  title               String
+  isInventoryEnabled  Boolean          @default(false)
+  inventoryBuyCount   BigInt           @default(0)
+  paymentPurpose      String? // Add enum field for payment purpose  createdAt           DateTime        @default(now())
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+}
+
+model newTransaction {
+  id                  String          @id @default(uuid())
+  stripeTransactionId String?         @unique
+  customerGuest       Boolean         @default(false)
+  customerId          String?
+  paymentPurpose      String?
+  price               String?
+  applicationFee      String?
+  stripeFee           String?
+  totalAmount         String?
+  status              String?         // pending | completed | failed | disputed
+  senderUserId        String?
+  receiverUserId      String?
+  reactionId          String?
+  boardId             String?
+  reaction            Reaction?       @relation(fields: [reactionId], references: [id])
+  board               Board?          @relation(fields: [boardId], references: [id])
+  senderUser          user?           @relation("senderUser", fields: [senderUserId], references: [id])
+  receiverUser        user?           @relation("receiverUser", fields: [receiverUserId], references: [id])
+  // customer            StripeCustomer? @relation(fields: [customerId], references: [id])
+  sellerAccountId     String?
+  // sellerAccount       SellerAccount?  @relation(fields: [sellerAccountId], references: [id])
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+}
+
+model SellerAccount {
+  id              String           @id @default(uuid())
+  sellerAccountId String           @unique // Store the Stripe connected account ID
+  users           user[]           @relation("UserSellerAccount")
+  transactions    Transaction[]
+  verified        Boolean          @default(false) // New field to track verification status
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now())
+  // newTransaction  newTransaction[]
+}
+
+//no use right now
+//vanish->
+//repalce->
+//this table action only perform vaish reqgarding we not put any flow replace releted, (we creaate another table)
+model Switch {
+  id                String     @id @default(uuid())
+  switchAction      String? //replace/vanish
+  vanishAction      String? //follow/ payment
+  vanishDescription String?
+  isLockTappable    Boolean    @default(false) //replce time if set the is lock
+  // isReplaceSale Boolean    @default(false) //is replace sale means replace done then is there any price
+  vanishPrice       String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  Tappable          Tappable[]
+  // Transaction       Transaction[]
+}
+
+model Reaction {
+  id                String      @id @default(uuid())
+  contentType       String? // Enum or string to define the type of content (e.g., 'text', 'photo', 'video', 'emoji')
+  contentText       String?     @db.Text // For text or emoji reactions
+  top               String? // Stores the top position as a percentage or pixel value
+  left              String? // Stores the left position as a percentage or pixel value
+  contentUrl        String? // URL for image, video, or GIF
+  boardImageId      String
+  emoji             String?
+  width             String?
+  height            String?
+  backgroundCapture String?
+  // Normalized 0–1 coordinates (resolution-agnostic, preferred for new boards)
+  normalizedX       Float?
+  normalizedY       Float?
+  boardImage        BoardImages @relation(fields: [boardImageId], references: [id])
+  userId            String?
+  user              user?       @relation(fields: [userId], references: [id])
+
+  // Self-referencing relation for replies
+  parentId String? // References the parent reaction (comment)
+  parent   Reaction?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  Reaction[] @relation("CommentReplies") // List of replies to this comment
+
+  ReactionLikes  ReactionLikes[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  Transaction    Transaction[]
+  newTransaction newTransaction[]
+}
+
+model ReactionLikes {
+  id         String    @id @default(uuid())
+  reactionId String?
+  userId     String?
+  user       user?     @relation(fields: [userId], references: [id])
+  reaction   Reaction? @relation(fields: [reactionId], references: [id])
+}
+
+//store here all tapable event
+model BoardEvent {
+  id          String   @id @default(uuid())
+  eventName   String?
+  description String
+  boardId     String
+  userId      String
+  user        user     @relation(fields: [userId], references: [id])
+  board       Board    @relation(fields: [boardId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+//one user can follow the multiple user.
+model UserFollow {
+  id         String   @id @default(uuid())
+  followerId String
+  userId     String //login user id
+  follower   user     @relation("Followers", fields: [followerId], references: [id])
+  user       user     @relation("Followings", fields: [userId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+//here we are managing the folder name and bookmarkBoards we are managing the all userId, board id  and Bookmark id
+
+model BookMarkFolder {
+  id              String            @id @default(uuid())
+  title           String
+  userId          String
+  isLocked        Boolean           @default(false)
+  user            user              @relation("BookMark", fields: [userId], references: [id])
+  BookMarksBoards BookMarksBoards[] @relation("BookMark")
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+//here we are using one table to bookmark and we are storing the board and also sale bookmarks here and maneging the book
+//here boardId means board id  and saleAdId means sale id.
+model BookMarksBoards {
+  id                  String         @id @default(uuid())
+  bookMarkFolderId    String
+  boardId             String?
+  bookmarkFeatureType String //either sale (ads) or boards
+  board               Board?         @relation("BookMarkBoard", fields: [boardId], references: [id])
+  saleAdId            String?
+  saleAds             sale?          @relation("BookmarkedSaleAds", fields: [saleAdId], references: [id])
+  BookMark            BookMarkFolder @relation("BookMark", fields: [bookMarkFolderId], references: [id])
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+}
+
+model FollowBoard {
+  id        String   @id @default(uuid())
+  userId    String //// one user can follow the multiple board
+  boardId   String
+  board     Board    @relation("followedBoard", fields: [boardId], references: [id])
+  user      user     @relation("followBoard", fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model sale {
+  id                String            @id @default(uuid())
+  title             String
+  description       String
+  // assetType         String //asset type should be physical and digitals
+  originalPrice     String
+  discountPrice     String?
+  userId            String
+  user              user              @relation("sale", fields: [userId], references: [id])
+  saleImages        saleImages[]      @relation("saleImages")
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  Comments          saleComments[]    @relation("saleComments")
+  Likes             saleLikes[]       @relation("saleCommentlike")
+  BookmarkedSaleAds BookMarksBoards[] @relation("BookmarkedSaleAds")
+  cart              Cart[]            @relation("saleCart")
+}
+
+model saleImages {
+  id        String   @id @default(uuid())
+  saleId    String
+  imageUrl  String
+  sale      sale     @relation("saleImages", fields: [saleId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//here we can store the all comment (sale, board...), just manage the one globle string wise(featuerType)
+model saleComments {
+  id             String         @id @default(uuid())
+  content        String //comment massage
+  userId         String
+  user           user           @relation(fields: [userId], references: [id])
+  saleId         String?
+  saleComments   sale?          @relation("saleComments", fields: [saleId], references: [id]) //to added sale ad (post reletion)
+  parentSaleAdId String? // This allows a comment to have a parent comment (null if it's a root comment)
+  parentSaleAds  saleComments?  @relation("CommentReplies", fields: [parentSaleAdId], references: [id])
+  replies        saleComments[] @relation("CommentReplies") // A comment can have multiple replies
+  likes          saleLikes[] // A comment can have multiple likes
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model saleLikes {
+  id        String       @id @default(uuid())
+  userId    String
+  user      user         @relation(fields: [userId], references: [id])
+  commentId String
+  postId    String
+  posts     sale         @relation("saleCommentlike", fields: [postId], references: [id])
+  comment   saleComments @relation(fields: [commentId], references: [id])
+  createdAt DateTime     @default(now())
+
+  @@unique([userId, commentId]) // Ensures a user can like a specific comment only once
+}
+
+model boardComments {
+  id                   String                    @id @default(uuid())
+  content              String //comment massage
+  userId               String
+  user                 user                      @relation(fields: [userId], references: [id])
+  boardImageId         String
+  boardId              String
+  BoardImagesComment   BoardImages               @relation("boardImagesComments", fields: [boardImageId], references: [id]) //to added sale ad (post reletion)
+  parentBoardCommentId String? // This allows a comment to have a parent comment (null if it's a root comment)
+  parentBoardComment   boardComments?            @relation("CommentReplies", fields: [parentBoardCommentId], references: [id])
+  board                Board                     @relation(fields: [boardId], references: [id]) //it help to delete time
+  replies              boardComments[]           @relation("CommentReplies") // A comment can have multiple replies
+  likes                BoardImagesCommentLikes[] // A comment can have multiple likes
+  createdAt            DateTime                  @default(now())
+  updatedAt            DateTime                  @updatedAt
+}
+
+model BoardImagesCommentLikes {
+  id           String        @id @default(uuid())
+  userId       String
+  user         user          @relation(fields: [userId], references: [id])
+  commentId    String
+  boardImageId String
+  Boards       BoardImages   @relation("BoardsImagesCommentlikes", fields: [boardImageId], references: [id])
+  comment      boardComments @relation(fields: [commentId], references: [id])
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@unique([userId, commentId]) //  specific comment only once
+}
+
+model Cart {
+  id            String   @id @default(uuid())
+  userId        String
+  boardId       String?
+  saleId        String?
+  isSaleOrBoard String
+  user          user     @relation("userCart", fields: [userId], references: [id])
+  sale          sale?    @relation("saleCart", fields: [saleId], references: [id])
+  Board         Board?   @relation("boardCart", fields: [boardId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  imageUrl  String // Base64 encoded image URL
+  tappables Json // JSON field for storing tappables
+  createdAt DateTime @default(now())
+}
+
