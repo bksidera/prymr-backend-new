@@ -3100,7 +3100,7 @@ export class BoardService {
     aUser: RequestUserDto,
   ) {
     try {
-      if (!data.boardImageId || !IsUUID(data.boardImageId)) {
+      if (!data.boardImageId || !isUUID(data.boardImageId)) {
         return await this.responseService.NOT_FOUND('boardImageId must be a valid UUID', {}, res);
       }
       const boardImage = await this.prismaService.boardImages.findFirst({
@@ -4808,7 +4808,7 @@ export class BoardService {
 
   async fetchBoardReactionPins(res, boardImageId: string) {
     try {
-      if (!boardImageId || !IsUUID(boardImageId)) {
+      if (!boardImageId || !isUUID(boardImageId)) {
         return await this.responseService.NOT_FOUND(
           'boardImageId must be a valid UUID',
           {},
