@@ -51,10 +51,8 @@ export class PaymentService {
       let customer;
 
       if (stripeCustomers.data.length > 0) {
-        console.info('log 45');
         // If customer exists on Stripe, use the existing one
         customer = stripeCustomers.data[0];
-        console.info(customer.id);
         // Step 2: Check if the customer exists in your local stripeCustomer table and is linked to the current user
 
         let custom_id = await this.prismaService.user.findFirst({
@@ -65,8 +63,6 @@ export class PaymentService {
             },
           },
         });
-        console.info(custom_id);
-        console.info('log 60');
         const existingCustomer =
           await this.prismaService.stripeCustomer.findFirst({
             where: {
@@ -77,8 +73,6 @@ export class PaymentService {
               },
             },
           });
-        console.info('log 60');
-        console.info(existingCustomer);
         if (existingCustomer) {
           // If the customer is already linked to the current user
           return await this.responseService.success(
@@ -88,7 +82,6 @@ export class PaymentService {
             res,
           );
         } else {
-          console.info('log 70');
           // If the customer exists on Stripe but not in your local DB, create an entry in your DB
           const newStripeCustomer =
             await this.prismaService.stripeCustomer.create({
@@ -97,14 +90,12 @@ export class PaymentService {
               },
             });
 
-          console.info(newStripeCustomer);
 
           // Link the newly created Stripe customer to the current user
           await this.prismaService.user.update({
             where: { id: aUser.id },
             data: { stripeCustomerId: newStripeCustomer.id },
           });
-          console.log('done');
 
           // Return the customer ID
           return await this.responseService.success(
@@ -276,7 +267,6 @@ export class PaymentService {
         }
       }
     } catch (error) {
-      console.info(error);
       return await this.responseService.INTERNAL_SERVER_ERROR(
         'Internal server error',
         error.toString(),
@@ -2801,7 +2791,6 @@ private async handlePaymentIntentSucceeded(paymentIntent: any) {
           res,
         );
       }
-      console.info('log 1424');
       // Create a new account for the seller with all required details
       const account = await this.stripe.accounts.create({
         type: 'express',
@@ -2815,7 +2804,6 @@ private async handlePaymentIntentSucceeded(paymentIntent: any) {
         },
       });
 
-      console.info('log 1438');
 
       //  Save the newly created seller account into your database
       await this.prismaService.sellerAccount.create({
@@ -2827,7 +2815,6 @@ private async handlePaymentIntentSucceeded(paymentIntent: any) {
         },
       });
 
-      console.info('log 1450');
 
       // Generate an account link to onboard the seller
       const accountLink = await this.stripe.accountLinks.create({
@@ -2838,7 +2825,6 @@ private async handlePaymentIntentSucceeded(paymentIntent: any) {
         // return_url: `http://localhost:3000/add-content?sellerAccountId=${account.id}`, // URL to redirect after successful onboarding
         type: 'account_onboarding',
       });
-      console.info('log 1462');
       // Return the URL to redirect the seller to complete onboarding
       return await this.responseService.success(
         'success',

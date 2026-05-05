@@ -22,34 +22,15 @@ import { MulterModule } from '@nestjs/platform-express';
 import { CloudinaryModule, CloudinaryService } from 'nestjs-cloudinary';
 import { BoardService } from './board/board.service';
 import { BoardModule } from './board/board.module';
-import { SocialModule } from './social/social.module';
-import { BookmarkController } from './bookmark/bookmark.controller';
-import { BookmarkService } from './bookmark/bookmark.service';
-import { BookmarkModule } from './bookmark/bookmark.module';
-import { SaleController } from './sale/sale.controller';
-import { SaleService } from './sale/sale.service';
-import { SaleModule } from './sale/sale.module';
-import { CommentController } from './comment/comment.controller';
-import { CommentService } from './comment/comment.service';
-import { CommentModule } from './comment/comment.module';
-import { LikeController } from './like/like.controller';
-import { LikeService } from './like/like.service';
-import { LikeModule } from './like/like.module';
-import { CartController } from './cart/cart.controller';
-import { CartService } from './cart/cart.service';
-import { CartModule } from './cart/cart.module';
 import { LocalStrategyModule } from './local-strategy/local-strategy.module';
-import { AdminModule } from './admin/admin.module';
 import { PaymentModule } from './payment/payment.module';
-import { BoardPreviewModule } from './board-preview/board-preview.module';
-
 
 import * as dotenv from 'dotenv';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    PrismaModule, 
+    PrismaModule,
     AuthModule,
     BcryptModule,
     GuardsModule,
@@ -63,32 +44,19 @@ import * as dotenv from 'dotenv';
     LoggerModule,
     FileUploadModule,
     MulterModule.register({
-      dest: './uploads', // Temporary storage for multer
+      dest: './uploads',
     }),
     BoardModule,
-    SocialModule,
-    BookmarkModule,
-    SaleModule,
-    CommentModule,
-    LikeModule,
-    CartModule,
     LocalStrategyModule,
-    AdminModule,
     PaymentModule,
-    BoardPreviewModule,
-
-  
-
   ],
-  controllers: [AppController, BookmarkController, SaleController, CommentController, LikeController, CartController],
-  providers: [AppService, ConstantsService, FileUploadService, BoardService, BookmarkService, SaleService, CommentService, LikeService, CartService],
+  controllers: [AppController],
+  providers: [AppService, ConstantsService, FileUploadService, BoardService],
 })
 export class AppModule {
-
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(CorsMiddlewareService)
       .forRoutes({ path: '*', method: RequestMethod.ALL });
-    // console.log(' configure called.....');
   }
 }

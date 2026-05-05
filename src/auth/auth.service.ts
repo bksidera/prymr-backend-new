@@ -11,14 +11,12 @@ import { ConstantsService } from 'src/constants/constants.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { EditProfileDetailDto } from './Dto/EditProfileDetailDto';
-import { PrismaClient } from '@prisma/client';
 import { CompleteProfileDetailDto } from './Dto/CompleteProfileDetailDto';
 import { IsEmail, IsUUID, IsUrl } from 'class-validator';
 import { VerifyForgotPassword } from './Dto/VerifyForgotPassword';
 import { ContactDto } from './Dto/ContactDto';
 import Stripe from 'stripe';
 
-const prisma = new PrismaClient();
 @Injectable()
 export class AuthService {
   private stripe: Stripe;
@@ -67,7 +65,13 @@ export class AuthService {
         { status: true },
         res,
       );
-    } catch (error) {}
+    } catch (error) {
+      return await this.responseService.INTERNAL_SERVER_ERROR(
+        'Internal server error',
+        error?.toString() ?? 'unknown',
+        res,
+      );
+    }
   }
 
   async deleteSecurityKey(res, securityKey: string) {
@@ -102,7 +106,13 @@ export class AuthService {
         { status: true },
         res,
       );
-    } catch (error) {}
+    } catch (error) {
+      return await this.responseService.INTERNAL_SERVER_ERROR(
+        'Internal server error',
+        error?.toString() ?? 'unknown',
+        res,
+      );
+    }
   }
   async updateSecurityKey(res, oldSecurityKey: string, newSecurityKey: string) {
     try {
@@ -164,7 +174,13 @@ export class AuthService {
         { status: true },
         res,
       );
-    } catch (error) {}
+    } catch (error) {
+      return await this.responseService.INTERNAL_SERVER_ERROR(
+        'Internal server error',
+        error?.toString() ?? 'unknown',
+        res,
+      );
+    }
   }
   /**
    *

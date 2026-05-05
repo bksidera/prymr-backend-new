@@ -183,31 +183,6 @@ export class BoardService {
   //       return await this.responseService.NOT_FOUND('User not found', {}, res);
   //     }
 
-  //     return await this.prismaService.$transaction(async (prisma) => {
-  //       try {
-  //         if (!data?.pages) {
-  //           return await this.responseService.NOT_FOUND(
-  //             'Image url must require',
-  //             {},
-  //             res,
-  //           );
-  //         }
-  //         if (!data.pages || !isArray(data.pages)) {
-  //           return await this.responseService.NOT_FOUND(
-  //             'All pages must require array',
-  //             {},
-  //             res,
-  //           );
-  //         }
-  //         for (const page of data.pages) {
-  //           if (!page?.imageUrl) {
-  //             return await this.responseService.NOT_FOUND(
-  //               'Image url must require',
-  //               {},
-  //               res,
-  //             );
-  //           }
-  //         }
 
   //         const board = await prisma.board.create({
   //           data: {
@@ -217,43 +192,7 @@ export class BoardService {
   //           },
   //         });
 
-  //         for (const page of data.pages) {
-  //           const imageUrl = page.imageUrl;
-  //           await prisma.boardImages.create({
-  //             data: {
-  //               imageUrl,
-  //               boardId: board.id,
-  //               title: page?.title,
-  //               description: page?.description,
-  //               jsonComment: page?.jsonComment,
-  //               jsonElement: page?.jsonElement,
-  //               boardStatus,
-  //             },
-  //           });
-  //         }
 
-  //         return await this.responseService.success(
-  //           'success',
-  //           'Board created successfully',
-  //           {},
-  //           res,
-  //         );
-  //       } catch (error) {
-  //         return await this.responseService.INTERNAL_SERVER_ERROR(
-  //           'Internal server error',
-  //           error.toString(),
-  //           res,
-  //         );
-  //       }
-  //     });
-  //   } catch (error) {
-  //     return await this.responseService.INTERNAL_SERVER_ERROR(
-  //       'Internal server error',
-  //       error.toString(),
-  //       res,
-  //     );
-  //   }
-  // }
 
   async fetchUserBoards(
     res,
@@ -849,25 +788,6 @@ export class BoardService {
       );
     }
   }
-  // async addBoardInfo(res, data: AddBoardInfoDto, aUser: RequestUserDto) {
-  //   try {
-  //     if (aUser.role == (await this.constantsService.userRole.user)) {
-  //       return await this.responseService.NOT_FOUND(
-  //         `You don't have permission to add boardInformation`,
-  //         {},
-  //         res,
-  //       );
-  //     }
-  //     if (!isBoolean(data.allowComments)) {
-  //       return await this.responseService.NOT_FOUND(
-  //         `allowComments should be true or false`,
-  //         {},
-  //         res,
-  //       );
-  //     }
-  //     const user = await this.prismaService.user.findFirst({
-  //       where: { id: aUser.id },
-  //     });
 
   //     if (!user) {
   //       return await this.responseService.NOT_FOUND('User not found', {}, res);
@@ -889,59 +809,8 @@ export class BoardService {
   //       );
   //     }
 
-  //     return await this.prismaService.$transaction(async (prisma) => {
-  //       try {
-  //         const board = await prisma.board.create({
-  //           data: {
-  //             userId: user.id,
-  //             allowComments: data.allowComments, //this is  we are using add board info time
-  //             // title: title,
-  //             // description: description,
-  //           },
-  //         });
 
-  //         const newBoardImage = await prisma.boardImages.create({
-  //           data: {
-  //             imageUrl: data.imageUrl,
-  //             boardId: board.id,
-  //             title: data.title,
-  //             description: data.description,
-  //             subTitle: data.subTitle,
-  //             allowComments: data.allowComments, //per board wise added comments options// 1 aug 2024
-  //           },
-  //           select: {
-  //             id: true,
-  //             boardId: true,
-  //             createdAt: true,
-  //           },
-  //         });
 
-  //         return await this.responseService.success(
-  //           'success',
-  //           'Board info added successfully',
-  //           {
-  //             boardImageId: newBoardImage.id,
-  //             boardId: newBoardImage.boardId,
-  //             createdAt: newBoardImage.createdAt,
-  //           },
-  //           res,
-  //         );
-  //       } catch (error) {
-  //         return await this.responseService.INTERNAL_SERVER_ERROR(
-  //           'Internal server error',
-  //           error.toString(),
-  //           res,
-  //         );
-  //       }
-  //     });
-  //   } catch (error) {
-  //     return await this.responseService.INTERNAL_SERVER_ERROR(
-  //       'Internal server error',
-  //       error.toString(),
-  //       res,
-  //     );
-  //   }
-  // }
 
   async fetchRecentPublicUserBoard(
     res,
@@ -1440,7 +1309,7 @@ export class BoardService {
       const count = await this.prismaService.tappable.count({
         where: {
           boardImageId: boardImageId,
-          isDeleted: true,
+          isDeleted: false,
           boardImage: {
             board: {
               user: {
@@ -1894,18 +1763,6 @@ export class BoardService {
         //   );
         // }
 
-        // switch (data.assetType.toLowerCase()) {
-        //   case this.constantsService.assetType.physical:
-        //     break;
-        //   case this.constantsService.assetType.digital:
-        //     break;
-        //   default:
-        //     return await this.responseService.NOT_FOUND(
-        //       'Asset type must be either [physical or digital]',
-        //       {},
-        //       res,
-        //     );
-        // }
 
         if (data.subTitle && data.subTitle.trim().length === 0) {
           return await this.responseService.NOT_FOUND(
@@ -2279,23 +2136,6 @@ export class BoardService {
       }
       const editTappableData: any = {};
 
-      // if (data.isSaleItem) {
-      //   if (data?.assetType && data?.assetType?.trim()?.length !== 0) {
-      //     switch (data.assetType.toLowerCase()) {
-      //       case this.constantsService.assetType.physical:
-      //         break;
-      //       case this.constantsService.assetType.digital:
-      //         break;
-      //       default:
-      //         return await this.responseService.NOT_FOUND(
-      //           'Asset type must be either [physical or digital]',
-      //           {},
-      //           res,
-      //         );
-      //     }
-      //   }
-      //   editTappableData.assetType = data.assetType;
-      //   editTappableData.isSaleItem = data.isSaleItem;
 
       //   if (data.price <= 0) {
       //     return await this.responseService.NOT_FOUND(
@@ -4171,16 +4011,15 @@ export class BoardService {
   //can private user and public user add the reactions ?
   async addReaction(res, data: AddReactionDto, aUser: RequestUserDto) {
     try {
-      let { paymentIntentId } = data;
-      const reaction = ['emoji', 'photo', 'video'];
-      if (data.contentUrl || data.contentUrl?.trim()?.length !== 0) {
-        if (!reaction.includes(data.reactionType.trim())) {
-          await this.responseService.NOT_FOUND(
-            'Reaction type should be [emoji,photo,video',
-            {},
-            res,
-          );
-        }
+      const { paymentIntentId } = data;
+      const allowedTypes = ['emoji', 'photo', 'video', 'text'];
+
+      if (data.contentUrl?.trim() && !allowedTypes.includes(data.reactionType?.trim())) {
+        return await this.responseService.NOT_FOUND(
+          'Reaction type must be one of [emoji, photo, video, text]',
+          {},
+          res,
+        );
       }
 
       if (
@@ -4189,7 +4028,7 @@ export class BoardService {
         !data.emoji?.trim()
       ) {
         return await this.responseService.NOT_FOUND(
-          'contentText or contentUrl must require',
+          'contentText, contentUrl, or emoji is required',
           {},
           res,
         );
@@ -4218,25 +4057,14 @@ export class BoardService {
         );
       }
 
-      // @kiran
-      let transactionId: any;
-      if (paymentIntentId) {
-        let { msg, status, id } =
-          await this.paymentService.captureReactionTipPayment(
-            paymentIntentId,
-            aUser,
-          );
-        if (!status) {
-          return await this.responseService.NOT_FOUND(
-            'Payment failed',
-            { msg },
-            res,
-          );
-        }
-        transactionId = id;
-      }
-
-      let { id } = await this.prismaService.reaction.create({
+      // Reaction-plus-capture flow:
+      // 1. Insert reaction in 'pending' state (DB only).
+      // 2. Capture Stripe + create newTransaction row.
+      // 3. Atomic update: link newTransaction.reactionId and flip reaction.status to 'confirmed'.
+      // If step 2 fails: roll back the pending reaction (no payment happened).
+      // If step 3 fails: the webhook handler backfills reactionId via paymentIntentId
+      //   idempotency, so payment is not lost.
+      const reaction = await this.prismaService.reaction.create({
         data: {
           boardImageId: data.boardImageId,
           contentType: data.reactionType,
@@ -4247,22 +4075,45 @@ export class BoardService {
           left: data.left,
           userId: aUser.id,
           emoji: data?.emoji,
+          status: paymentIntentId ? 'pending' : 'confirmed',
+          paymentIntentId: paymentIntentId ?? null,
         },
       });
 
       if (paymentIntentId) {
-        // payment id mng
-        await this.prismaService.newTransaction.update({
-          where: { id: transactionId },
-          data: {
-            reactionId: id,
-          },
-        });
+        const captureResult =
+          await this.paymentService.captureReactionTipPayment(
+            paymentIntentId,
+            aUser,
+          );
+
+        if (!captureResult.status) {
+          await this.prismaService.reaction.delete({
+            where: { id: reaction.id },
+          });
+          return await this.responseService.NOT_FOUND(
+            'Payment capture failed',
+            { msg: captureResult.msg },
+            res,
+          );
+        }
+
+        await this.prismaService.$transaction([
+          this.prismaService.newTransaction.update({
+            where: { id: captureResult.id },
+            data: { reactionId: reaction.id },
+          }),
+          this.prismaService.reaction.update({
+            where: { id: reaction.id },
+            data: { status: 'confirmed' },
+          }),
+        ]);
       }
+
       return await this.responseService.success(
         'success',
-        'Reaction added success',
-        {},
+        'Reaction added successfully',
+        { id: reaction.id },
         res,
       );
     } catch (error) {
@@ -4324,21 +4175,6 @@ export class BoardService {
 
       // @kiran
       let transactionId: any;
-      // if (paymentIntentId) {
-      //   let { msg, status, id } =
-      //     await this.paymentService.captureReactionTipPayment(
-      //       paymentIntentId,
-      //       aUser,
-      //     );
-      //   if (!status) {
-      //     return await this.responseService.NOT_FOUND(
-      //       'Payment failed',
-      //       { msg },
-      //       res,
-      //     );
-      //   }
-      //   transactionId = id;
-      // }
 
       let newReaction = await this.prismaService.reaction.create({
         data: {
@@ -4832,13 +4668,21 @@ export class BoardService {
               userName: true,
             },
           },
+          _count: {
+            select: { newTransaction: true },
+          },
         },
         orderBy: { createdAt: 'asc' },
       });
+      // Flatten _count into a hasPayment boolean for the frontend
+      const data = reactions.map(({ _count, ...r }) => ({
+        ...r,
+        hasPayment: (_count?.newTransaction ?? 0) > 0,
+      }));
       return await this.responseService.success(
         'success',
         'Board reaction pins fetched',
-        { data: reactions },
+        { data },
         res,
       );
     } catch (error) {
@@ -5853,26 +5697,6 @@ export class BoardService {
           },
         },
       });
-      // const data = fetchAllLayers.map((layer) => ({
-      //   tappableId: layer.id,
-      //   isReplace: layer.isReplace,
-      //   isVanish: layer.isVanish,
-      //   isTappable: layer.isTappable,
-      //   actionName: layer.actionName,
-      //   boardId: layer.boardId,
-      //   description: layer.description,
-      //   switchId: layer.switchId,
-      //   title: layer.title,
-      //   width: layer.width,
-      //   height: layer.height,
-      //   top: layer.top,
-      //   left: layer.left,
-      //   contentImage:
-      //     layer?.ContentImagesLinks?.length != 0
-      //       ? layer.ContentImagesLinks[0]
-      //       : null,
-      //   replaceActions: layer.replaceTappable,
-      // }));
 
       // Initialize the data array with mapped values
       const data = fetchAllLayers.map((layer) => {
@@ -6452,19 +6276,6 @@ export class BoardService {
       ) {
         return await this.responseService.UNAUTHORIZED('Invalid User', res);
       }
-      // if(data.actionName==await this.constantsService.replaceOrVanishSubActionName.Payment){
-      //   const findUser = await this.prismaService.user.findFirst({
-      //     where: {
-      //       id: aUser.id,
-      //     },
-      //     select: {
-      //       sellerAccountId: true,
-      //     },
-      //   });
-      //   if(!findUser.sellerAccountId){
-      //     return await this.responseService.NOT_FOUND("Please link your account to make payment",{},res);
-      //   }
-      // }
 
       if (!this.commonService.validateFlags(data)) {
         return await this.responseService.NOT_FOUND(
@@ -6543,31 +6354,6 @@ export class BoardService {
             },
           });
 
-        // if (validTappable) {
-        //   if (validTappable.layerName == newLayerName) {
-        //     // if(validTappable.isInfoOverlay){}
-        //     await this.prismaService.replaceTappable.update({
-        //       where: {
-        //         id: validTappable.id,
-        //       },
-        //       data: {
-        //         ContentImagesLinks: data?.contentImagesLinks,
-        //         title: data?.title,
-        //         description: data?.description,
-        //         price: data?.price,
-        //         isInfoOverlay: data?.isInfoOverlay,
-        //         isLockTappable: data?.isLockTappable,
-        //         actionName: data?.actionName,
-        //       },
-        //     });
-        //     return await this.responseService.success(
-        //       'success',
-        //       'Replace switch action updated success',
-        //       {},
-        //       res,
-        //     );
-        //   }
-        // } else {
 
         let validateLayerNumber =
           await this.prismaService.replaceTappable.findFirst({
@@ -7247,22 +7033,6 @@ export class BoardService {
       // Collect all replaceTappable IDs to check purchases in one query
       const replaceIds = findReplace.map((item) => item.id);
 
-      // Fetch all transactions for these replaceIds and the logged-in user
-      // const transactions = await this.prismaService.transaction.findMany({
-      //   where: {
-      //     replaceId: { in: replaceIds },
-      //     customer: {
-      //       users: {
-      //         some: {
-      //           id: aUser.id,
-      //         },
-      //       },
-      //     },
-      //   },
-      //   select: {
-      //     replaceId: true, // Only need replaceId to match with tappables
-      //   },
-      // });
 
       // // Create a set of purchased replaceIds for easier lookup
       // const purchasedReplaceIds = new Set(
@@ -7623,39 +7393,7 @@ export class BoardService {
 
       //--------------------------------------------------------------------
 
-      // const tappables = tappable.map((tappable) => ({
-      //   tappableId: tappable.id,
-      //   onTapAction: tappable.actionName,
-      //   left: tappable.left,
-      //   top: tappable.top,
-      //   createdAt: tappable.createdAt,
-      //   type: 'tappable',//add static
-      //   width: tappable.width,
-      //   height: tappable.height,
-      //   isTappable: tappable.isTappable,
-      //   tappableImage: tappable?.tappableImage,
-      //   ContentImagesLinks: tappable?.ContentImagesLinks,
-      //   isReplace: tappable.isReplace, //layer wise change the containt
-      //   isVanish: tappable.isVanish,
-      //   vanishId: tappable?.switchId,
-      // }));
 
-      // const reaction = reactions.map((reaction) => ({
-      //   reactionId: reaction.id,
-      //   left: reaction.left,
-      //   top: reaction.top,
-      //   emoji: reaction.emoji,
-      //   width: reaction?.width ? reaction.width : null,
-      //   height: reaction?.height ? reaction?.height : null,
-      //   createdAt: reaction.createdAt,
-      //   type: 'reaction',
-      //   profileIcon: reaction.user?.profileIcon
-      //     ? reaction.user?.profileIcon
-      //     : null,
-      //   initialProfileIcon: reaction?.user?.initialProfileIcon
-      //     ? reaction?.user?.initialProfileIcon
-      //     : null,
-      // }));
 
       //---------------------------------
 
@@ -7706,33 +7444,6 @@ export class BoardService {
     }
   }
 
-  // async fetchRecentBoardOnHomePage(
-  //   res,
-  //   // tappablePageSize: number,
-  //   paginationDto: PaginationDto,
-  //   userName: string,
-  //   loginUserId: string,
-  // ) {
-  //   try {
-  //     const { page, pageSize } = paginationDto;
-  //     let params;
-  //     let profileIcon;
-  //     let initialProfileIcon;
-  //     // Check for valid page and pageSize
-  //     if (!page || page <= 0) {
-  //       return await this.responseService.NOT_FOUND(
-  //         'Page must be greater than 0',
-  //         {},
-  //         res,
-  //       );
-  //     }
-  //     if (!pageSize || pageSize <= 0) {
-  //       return await this.responseService.NOT_FOUND(
-  //         'Page size must be greater than 0',
-  //         {},
-  //         res,
-  //       );
-  //     }
 
   //     // if (!tappablePageSize || tappablePageSize <= 0) {
   //     //   return await this.responseService.NOT_FOUND(
@@ -7742,28 +7453,6 @@ export class BoardService {
   //     //   );
   //     // }
 
-  // let followData: { isFollow: boolean; isSameUser: boolean,isStandardUser:boolean,standardUserId:string } = {
-  //   isFollow: false,
-  //   isSameUser: false,
-  //   isStandardUser:false,
-  //   standardUserId:""
-  // };
-  //     let defaultUserId;
-  //     if (!userName || /^\s*$/.test(userName)) {
-  //       const findDefaultCreatorId = await this.prismaService.user.findFirst({
-  //         where: {
-  //           // userName:"prymr",
-  //           isDefaultCreatorUser: true,
-  //           isDeleted: false,
-  //           role: await this.constantsService.newUserRole.publicCreator,
-  //         },
-  //         select: {
-  //           userName: true,
-  //           id: true,
-  //           profileIcon: true,
-  //           initialProfileIcon: true,
-  //         },
-  //       });
 
   //       if (!findDefaultCreatorId) {
   //         return await this.responseService.NOT_FOUND(
@@ -7775,367 +7464,29 @@ export class BoardService {
   //       defaultUserId = findDefaultCreatorId.id;
   //       ///defalut creatot ko follow kar raha he ki nahi check karna he
 
-  //       if (isUUID(loginUserId)) {
-  //         if (loginUserId == defaultUserId) {
-  //           followData.isSameUser = true; // if login user and loing user is same manes both are same so he can not follow.
-  //           followData.isFollow = false;
-  //         } else {
-  //           let validateUserIsFollowing =
-  //             await this.prismaService.userFollow.findFirst({
-  //               where: {
-  //                 userId: loginUserId,
-  //                 followerId: findDefaultCreatorId.id,
-  //               },
-  //             });
-  //           if (validateUserIsFollowing) {
-  //             followData.isSameUser = false; // if login user and loing user is same manes both are same so he can not follow.
-  //             followData.isFollow = true;
-  //           }
-  //         }
-  //       }
-  //       params = 'prymr';
-  //       profileIcon = findDefaultCreatorId.profileIcon;
-  //       initialProfileIcon = findDefaultCreatorId.initialProfileIcon;
-  //     } else {
-  //       const findCreatorId = await this.prismaService.user.findFirst({
-  //         where: {
-  //           userName: {
-  //             contains: userName?.trim().toLowerCase(),
-  //             mode: 'insensitive',
-  //           },
-  //           isDefaultCreatorUser: false,
-  //           isDeleted: false,
-  //           role: await this.constantsService.newUserRole.publicCreator,
-  //         },
-  //         select: {
-  //           userName: true,
-  //           id: true,
-  //           profileIcon: true,
-  //           initialProfileIcon: true,
-  //         },
-  //       });
-  //       // console.info(findCreatorId);
 
   //       if (!findCreatorId) {
 
   //       // return await this.responseService.NOT_FOUND("User name not found, If you want to go prymr profile ?",{},res);
 
-  //         const findDefaultCreatorId = await this.prismaService.user.findFirst({
-  //           where: {
-  //             isDefaultCreatorUser: true,
-  //             isDeleted: false,
-  //             role: await this.constantsService.newUserRole.publicCreator,
-  //           },
-  //           select: {
-  //             userName: true,
-  //             id: true,
-  //             profileIcon: true,
-  //             initialProfileIcon: true,
-  //           },
-  //         });
 
-  //         if (!findDefaultCreatorId) {
-  //           return await this.responseService.NOT_FOUND(
-  //             'something is wrong no default user found',
-  //             {},
-  //             res,
-  //           );
-  //         }
-  //         defaultUserId = findDefaultCreatorId.id;
-  //         params = 'prymr';
-  //         profileIcon = findDefaultCreatorId.profileIcon;
-  //         initialProfileIcon = findDefaultCreatorId.initialProfileIcon;
-  //         //is follow kar he nahi
-  //         //if passed user is not an and creator but  this user is standard user so we have to check the is user is followed or not
-  //         if (isUUID(loginUserId)) {
-  //           if (loginUserId == defaultUserId) {
-  //             followData.isSameUser = true; // if login user and loing user is same manes both are same so he can not follow.
-  //             followData.isFollow = false;
-  //           } else {
-  //             let validateUserIsFollowing =
-  //               await this.prismaService.userFollow.findFirst({
-  //                 where: {
-  //                   userId: loginUserId,
-  //                   followerId: findDefaultCreatorId.id,
-  //                 },
-  //               });
-  //             if (validateUserIsFollowing) {
-  //               followData.isSameUser = false; // if login user and loing user is same manes both are same so he can not follow.
-  //               followData.isFollow = true;
-  //             }
-  //           }
-  //         }
 
-  //         const findUser = await this.prismaService.user.findFirst({
-  //           where: {
-  //             userName: {
-  //               contains: userName?.trim().toLowerCase(),
-  //               mode: 'insensitive',
-  //             },
-  //             isDefaultCreatorUser: false,
-  //             isDeleted: false,
-  //             role: {
-  //               notIn:[await this.constantsService.newUserRole.privateCreator,await this.constantsService.newUserRole.publicCreator]
-  //             }
-  //           },
-  //           select: {
-  //             userName: true,
-  //             id: true,
-  //             profileIcon: true,
-  //             initialProfileIcon: true,
-  //           },
-  //         });
 
   //       ///
 
-  //       defaultUserId = findUser.id;
-  //         params = 'prymr';
-  //         profileIcon = findDefaultCreatorId.profileIcon;
-  //         initialProfileIcon = findDefaultCreatorId.initialProfileIcon;
-  //         //is follow kar he nahi
-  //         //if passed user is not an and creator but  this user is standard user so we have to check the is user is followed or not
-  //         if (isUUID(loginUserId)) {
-  //           if (loginUserId == defaultUserId) {
-  //             followData.isSameUser = true; // if login user and loing user is same manes both are same so he can not follow.
-  //             followData.isFollow = false;
-  //           } else {
-  //             let validateUserIsFollowing =
-  //               await this.prismaService.userFollow.findFirst({
-  //                 where: {
-  //                   userId: loginUserId,
-  //                   followerId: defaultUserId.id,//checking the normal user is following user.
-  //                 },
-  //               });
-  //             if (validateUserIsFollowing) {
-  //               followData.isSameUser = false; // if login user and loing user is same manes both are same so he can not follow.
-  //               followData.isFollow = true;
-  //               followData.isStandardUser=true;
-  //               followData.standardUserId=defaultUserId.id;
-  //             }
-  //           }
-  //         }
 
   //       //
 
-  //       } else {
-  //         defaultUserId = findCreatorId.id;
-  //         params = userName;
-  //         profileIcon = findCreatorId.profileIcon;
-  //         initialProfileIcon = findCreatorId.initialProfileIcon;
-  //         ///is floow he ki nahi
-  //         if (isUUID(loginUserId)) {
-  //           if (loginUserId == defaultUserId) {
-  //             followData.isSameUser = true; // if login user and loing user is same manes both are same so he can not follow.
-  //             followData.isFollow = false;
-  //           } else {
-  //             let validateUserIsFollowing =
-  //               await this.prismaService.userFollow.findFirst({
-  //                 where: {
-  //                   userId: loginUserId,
-  //                   followerId: findCreatorId.id,
-  //                 },
-  //               });
-  //             if (validateUserIsFollowing) {
-  //               followData.isSameUser = false; // if login user and loing user is same manes both are same so he can not follow.
-  //               followData.isFollow = true;
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
 
-  //     const pageNum = Number(page);
-  //     const pageSizeNum = Number(pageSize);
-  //     const skip = (pageNum - 1) * pageSizeNum;
-  //     const count = await this.prismaService.board.count({
-  //       where: {
-  //         isDeleted: false,
-  //         BoardImages: {
-  //           every: {
-  //             boardStatus: await this.constantsService.boardStatus.published,
-  //           },
-  //         },
-  //         userId: defaultUserId,
-  //       },
-  //     });
-  //     const boards = await this.prismaService.board.findMany({
-  //       where: {
-  //         isDeleted: false,
-  //         BoardImages: {
-  //           every: {
-  //             boardStatus: await this.constantsService.boardStatus.published,
-  //           },
-  //         },
-  //         userId: defaultUserId,
-  //       },
-  //       take: pageSizeNum,
-  //       skip,
-  //       orderBy: {
-  //         createdAt: 'desc',
-  //       },
-  //       select: {
-  //         id: true,
-  //         boardImageScr: true,
-  //         user: {
-  //           select: {
-  //             id: true,
-  //             profileIcon: true,
-  //             initialProfileIcon: true,
-  //             userName: true,
-  //           },
-  //         },
 
-  //         BoardImages: {
-  //           select: {
-  //             id: true,
-  //             imageUrl: true,
-  //             description: true,
-  //             title: true,
-  //             createdAt: true,
-  //             _count: {
-  //               select: {
-  //                 BoardImagesCommentLikes: true,
-  //                 boardImagesComments: true,
-  //               },
-  //             },
-  //             tappable: {
-  //               where: {
-  //                 isDeleted: false,
-  //               },
-  //               // take: +tappablePageSize,
-  //               // skip: 0,
-  //               select: {
-  //                 id: true, //this is tappable id when click on the tappable then fetch the tappable details and actions
-  //                 tappableImage: true,
-  //                 ContentImagesLinks: true,
-  //                 isTappable: true, //if is not tappable then no create the blue icon
-  //                 isVanish: true,
-  //                 isReplace: true,
-  //                 switchId: true,
-  //                 //------------------
-  //                 actionName: true,
-  //                 left: true,
-  //                 top: true,
-  //                 width: true,
-  //                 height: true,
-  //                 createdAt: true,
-  //                 replaceTappable: {
-  //                   select: {
-  //                     isVanish: true,
-  //                     isReplace: true,
-  //                     isInfoOverlay: true,
-  //                     id: true,
-  //                   },
-  //                 },
-  //               },
-  //             },
-  //             Reaction: {
-  //               select: {
-  //                 id: true,
-  //                 top: true,
-  //                 left: true,
-  //                 height: true,
-  //                 width: true,
-  //                 emoji: true,
-  //                 createdAt: true,
-  //                 user: {
-  //                   select: {
-  //                     userName: true,
-  //                     initialProfileIcon: true,
-  //                     profileIcon: true,
-  //                   },
-  //                 },
-  //               },
-  //             },
-  //           },
-  //         },
-  //       },
-  //     });
 
   //     //--------------------------------------------------------------------
 
-  //     // const tappables = tappable.map((tappable) => ({
-  //     //   tappableId: tappable.id,
-  //     //   onTapAction: tappable.actionName,
-  //     //   left: tappable.left,
-  //     //   top: tappable.top,
-  //     //   createdAt: tappable.createdAt,
-  //     //   type: 'tappable',//add static
-  //     //   width: tappable.width,
-  //     //   height: tappable.height,
-  //     //   isTappable: tappable.isTappable,
-  //     //   tappableImage: tappable?.tappableImage,
-  //     //   ContentImagesLinks: tappable?.ContentImagesLinks,
-  //     //   isReplace: tappable.isReplace, //layer wise change the containt
-  //     //   isVanish: tappable.isVanish,
-  //     //   vanishId: tappable?.switchId,
-  //     // }));
 
-  //     // const reaction = reactions.map((reaction) => ({
-  //     //   reactionId: reaction.id,
-  //     //   left: reaction.left,
-  //     //   top: reaction.top,
-  //     //   emoji: reaction.emoji,
-  //     //   width: reaction?.width ? reaction.width : null,
-  //     //   height: reaction?.height ? reaction?.height : null,
-  //     //   createdAt: reaction.createdAt,
-  //     //   type: 'reaction',
-  //     //   profileIcon: reaction.user?.profileIcon
-  //     //     ? reaction.user?.profileIcon
-  //     //     : null,
-  //     //   initialProfileIcon: reaction?.user?.initialProfileIcon
-  //     //     ? reaction?.user?.initialProfileIcon
-  //     //     : null,
-  //     // }));
 
   //     //---------------------------------
 
-  //     const formattedBoards = boards.map((board) => {
-  //       return {
-  //         id: board.id,
-  //         boardImageScr: board.boardImageScr,
-  //         user: {
-  //           id: board.user.id,
-  //           profileIcon: board.user?.profileIcon
-  //             ? board.user?.profileIcon
-  //             : board?.user?.initialProfileIcon,
-  //           userName: board.user.userName,
-  //         },
-  //         BoardImages: board.BoardImages.map((image) => ({
-  //           id: image.id,
-  //           imageUrl: image.imageUrl,
-  //           description: image.description,
-  //           title: image.title,
-  //           createdAt: image.createdAt,
-  //           commentLikesCount: image._count.BoardImagesCommentLikes,
-  //           commentsCount: image._count.boardImagesComments,
-  //           tappable: image?.tappable,
-  //           reaction: image.Reaction,
-  //         })),
-  //       };
-  //     });
 
-  //     return await this.responseService.success(
-  //       'success',
-  //       'Recent board fetched success',
-  //       {
-  //         count: count,
-  //         param: params,
-  //         followData: followData,
-  //         profileIcon: profileIcon,
-  //         initialProfileIcon: initialProfileIcon,
-  //         data: formattedBoards,
-  //       },
-  //       res,
-  //     );
-  //   } catch (error) {
-  //     return await this.responseService.INTERNAL_SERVER_ERROR(
-  //       'Internal server error',
-  //       error.toString(),
-  //       res,
-  //     );
-  //   }
-  // }
 
   //---------------before login api's--------------------------------------------------------
 
@@ -8552,30 +7903,6 @@ export class BoardService {
       // Collect all replaceTappable IDs to check purchases in one query
       // const replaceIds = findReplace.map((item) => item.id);
 
-      // Fetch all transactions for these replaceIds and the logged-in user
-      // const transactions = await this.prismaService.transaction.findFirst({
-      //   where: {
-      //     OR: [
-      //       {
-      //         replaceId: layerId,
-      //       },
-      //       {
-      //         switchId: layerId,
-      //       },
-      //     ],
-      //     // replaceId: { in: replaceIds },
-      //     // customer: {
-      //     //   users: {
-      //     //     some: {
-      //     //       id: aUser.id,
-      //     //     },
-      //     //   },
-      //     // },
-      //   },
-      //   select: {
-      //     replaceId: true, // Only need replaceId to match with tappables
-      //   },
-      // });
 
       // Create a set of purchased replaceIds for easier lookup
       // const purchasedReplaceIds = new Set(
