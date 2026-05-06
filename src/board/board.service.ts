@@ -3425,7 +3425,7 @@ export class BoardService {
         );
       }
 
-      const validateBoard = await this.prismaService.board.findFirst({
+      const privateOwnerBoard = await this.prismaService.board.findFirst({
         where: {
           id: boardId,
           isDeleted: false,
@@ -3437,7 +3437,7 @@ export class BoardService {
         },
       });
 
-      if (!validateBoard) {
+      if (privateOwnerBoard) {
         return await this.responseService.NOT_FOUND(
           'Invalid board id boardId,Pass the correct public user board Id',
           {},

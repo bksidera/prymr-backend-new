@@ -17,8 +17,8 @@ export class AddReactionDto {
   @IsIn(['text', 'photo', 'video', 'emoji'])
   reactionType: string;
 
+  @IsOptional()
   @IsString()
-  @IsUrl()
   backgroundCapture: string;
 
   // // contentText is required only if reactionType is 'text' or 'emoji'
