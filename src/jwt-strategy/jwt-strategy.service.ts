@@ -1,18 +1,19 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
+
+export interface AuthPrincipal {
+  id: string;
+  kind: 'creator' | 'giver';
+  email: string;
+  name: string;
+  slug?: string;
+}
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private readonly prismaService: PrismaService,
-    // private readonly userService:UserService,
-  ) {
+  constructor(private readonly prismaService: PrismaService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -20,58 +21,29 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  // Automatic calla this method when we use 'JwtAuthGuard'
-  // JWT Token Validation
-  async validate(payload) {
-    if (!payload) {
-      throw new HttpException(
-        {
-          status: HttpStatus.OK,
-          message: 'UNAUTHORIZED User',
-          data: {},
-        },
-        HttpStatus.OK,
+  async validate(payload: { sub: string; kind: 'creator' | 'giver' }): Promise<AuthPrincipal> {
+    const unauthorized = () =>
+      new HttpException(
+        { status: false, message: 'UNAUTHORIZED', data: {} },
+        HttpStatus.UNAUTHORIZED,
       );
+
+    if (!payload?.sub || !payload?.kind) throw unauthorized();
+
+    if (payload.kind === 'creator') {
+      const creator = await this.prismaService.creator.findUnique({
+        where: { id: payload.sub },
+        select: { id: true, email: true, name: true, slug: true },
+      });
+      if (!creator) throw unauthorized();
+      return { ...creator, kind: 'creator' };
     }
-    const user = await this.prismaService.user.findFirst({
-      where: {
-        id: payload.id,
-      },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        userName: true,
-        lastName: true,
-        // wallet_address:true,
-        role:true,
-        profile_is_completed: true,
-        createdAt: true,
-      },
+
+    const giver = await this.prismaService.giver.findUnique({
+      where: { id: payload.sub },
+      select: { id: true, email: true, name: true },
     });
-
-    if (!user) {
-      throw new HttpException(
-        {
-          status: HttpStatus.OK,
-          message: 'UNAUTHORIZED User',
-          data: {},
-        },
-        HttpStatus.OK,
-      );
-    }
-
-    return {
-      id: user.id,
-      userName: user.userName,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role:user.role,
-      // walletAddress:user.wallet_address,
-      createdAt: user.createdAt,
-    };
+    if (!giver) throw unauthorized();
+    return { ...giver, kind: 'giver' };
   }
 }
-
-

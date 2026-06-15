@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
-import { JwtAuthGuard, LocalAuthGuard } from './guards.service';
+import { CreatorGuard, JwtAuthGuard } from './guards.service';
 
 @Module({
-    providers: [JwtAuthGuard, LocalAuthGuard],
-    exports: [JwtAuthGuard, LocalAuthGuard],
+  providers: [JwtAuthGuard, CreatorGuard],
+  exports: [JwtAuthGuard, CreatorGuard],
 })
-export class GuardsModule {
-}
+export class GuardsModule {}

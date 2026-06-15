@@ -3,6 +3,6 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AppService {
   getHello(): string {
-    return `Welcome to  Prymr ${new Date()}`;
+    return `PLATFORM API · ${new Date().toISOString()}`;
   }
 }

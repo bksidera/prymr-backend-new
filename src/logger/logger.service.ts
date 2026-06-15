@@ -1,42 +1,17 @@
 import { Injectable } from '@nestjs/common';
-// import { createLogger, transports, format } from 'winston';
-// import * as DailyRotateFile from 'winston-daily-rotate-file';
-// import { join } from 'path';
 
+// Vercel captures stdout/stderr; structured transports can come later if needed.
 @Injectable()
 export class LoggerService {
-    // private logger;
+  log(message: string) {
+    console.log(message);
+  }
 
-    // constructor() {
-    //     const fileRotateTransport = new DailyRotateFile({
-    //         filename: join(
-    //             __dirname,
-    //             `../../logs/${process.env.NODE_ENV || 'development'}/%DATE%.txt`,
-    //         ),
-    //         datePattern: 'YYYY-MM-DD',
-    //         // maxFiles: '14d',
-    //     });
+  warn(message: string) {
+    console.warn(message);
+  }
 
-    //     this.logger = createLogger({
-    //         level: 'debug',
-    //         format: format.combine(
-    //             format.label({ label: 'Log Rotation' }),
-    //             format.timestamp({ format: 'MMM-DD-YYYY HH:mm:ss' }),
-    //             format.printf(({ level, message, label, timestamp }) => `${timestamp} [${label}] ${level}: ${message}`),
-    //         ),
-    //         transports: [fileRotateTransport, new transports.Console()],
-    //     });
-
-    //     if (process.env.NODE_ENV !== 'production') {
-    //         this.logger.add(
-    //             new transports.Console({
-    //                 format: format.simple(),
-    //             }),
-    //         );
-    //     }
-    // }
-
-    // getLogger() {
-    //     return this.logger;
-    // }
+  error(message: string) {
+    console.error(message);
+  }
 }

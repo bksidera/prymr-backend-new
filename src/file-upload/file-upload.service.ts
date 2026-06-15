@@ -14,7 +14,6 @@ import {
   CreateMultipartUploadCommandOutput
 } from '@aws-sdk/client-s3';
 import { Response } from "express";
-import { RequestUserDto } from 'src/auth/Dto/RequestUserDto';
 import { CommonService } from "src/common/common.service";
 import * as crypto from 'crypto'
 import { InitiateUploadDto } from './Dto/InitiateUploadDto';
@@ -67,7 +66,7 @@ export class FileUploadService {
 
       const fileExtension: { extension: string; type: string } = await this.commonService.getExtensionFromAllMimeType(file.mimetype);
 
-      if (fileExtension.extension === "unknown")
+      if (!fileExtension.extension || fileExtension.extension === "unknown")
         return await this.responseService.FORBIDDED(`This file type is not allowed`, res);
 
       const randomSuffix = crypto.randomBytes(8).toString('hex');
@@ -413,7 +412,7 @@ export class FileUploadService {
 //       }
 //       const newItemId = generateDefaultUUID();
 //       // console.info(newItemId);
-//       const defaultFileName = "prymrFile"; // Define your static file name
+//       const defaultFileName = "uploadFile"; // Define your static file name
 //       // Get the file extension from the MIME type
 //       const extension = file.mimetype.split('/')[1]; // Extract the extension (e.g., 'jpeg', 'mp4', etc.)
 //       // console.info(extension);
@@ -530,7 +529,7 @@ export class FileUploadService {
 //         }
         
 //         const newItemId = generateDefaultUUID();
-//         const defaultFileName = "prymrFile"; // Define your static file name
+//         const defaultFileName = "uploadFile"; // Define your static file name
 //         const extension = file.mimetype.split('/')[1] || 'unknown'; // Extract the extension
 //         if (extension === 'unknown') {
 //           return await this.responseService.NOT_FOUND(

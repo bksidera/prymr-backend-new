@@ -4,7 +4,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FileUploadService } from './file-upload.service';
 import { JwtAuthGuard } from 'src/guards/guards.service';
 import { REQUEST } from '@nestjs/core';
-import { RequestUserDto } from 'src/auth/Dto/RequestUserDto';
 import { Response } from "express";
 import { InitiateUploadDto } from './Dto/InitiateUploadDto';
 import { UploadChunkDto } from './Dto/UploadChunkDto';
